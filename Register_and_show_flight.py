@@ -13,6 +13,7 @@ video_file_path = 'C:\\Users\SWC\Dropbox (UCL - SWC)\DAQ\\upstairs_rig\\18NOV02_
 save_file_path = 'C:\Drive\DLC\data\wall_data'
 
 # file path of fisheye correction -- set to an invalid location such as '' to skip fisheye correction
+# A corrective mapping for the branco lab's typical camera is included in the repo!
 fisheye_map_location = 'C:\Drive\DLC\data\\fisheye_maps.npy'
 
 # frame of stimulus onset
