@@ -48,30 +48,30 @@ def get_background(vidpath, start_frame = 1000, avg_over = 100):
 def model_arena(size):
     ''' NOTE: this is the model arena for the Barnes maze with wall
     this function must be customized for any other arena'''
-    # initialize model arena
-    model_arena = np.zeros((1000,1000)).astype(np.uint8)
-    cv2.circle(model_arena, (500,500), 460, 255, -1)
+    # # initialize model arena
+    # model_arena = np.zeros((1000,1000)).astype(np.uint8)
+    # cv2.circle(model_arena, (500,500), 460, 255, -1)
 
-    # add wall - up
-    cv2.rectangle(model_arena, (int(500 - 554 / 2), int(500 - 6 / 2)), (int(500 + 554 / 2), int(500 + 6 / 2)), 60, thickness=-1)
-    # add wall - down
-    cv2.rectangle(model_arena, (int(500 - 504 / 2), int(500 - 8 / 2)), (int(500 + 504 / 2), int(500 + 8 / 2)), 0, thickness=-1)
+    # # add wall - up
+    # cv2.rectangle(model_arena, (int(500 - 554 / 2), int(500 - 6 / 2)), (int(500 + 554 / 2), int(500 + 6 / 2)), 60, thickness=-1)
+    # # add wall - down
+    # cv2.rectangle(model_arena, (int(500 - 504 / 2), int(500 - 8 / 2)), (int(500 + 504 / 2), int(500 + 8 / 2)), 0, thickness=-1)
 
-    # add shelter
-    model_arena_shelter = model_arena.copy()
-    cv2.rectangle(model_arena_shelter, (int(500 - 50), int(500 + 385 + 25 - 50)), (int(500 + 50), int(500 + 385 + 25 + 50)), (0, 0, 255),thickness=-1)
-    alpha = .5
-    cv2.addWeighted(model_arena, alpha, model_arena_shelter, 1 - alpha, 0, model_arena)
+    # # add shelter
+    # model_arena_shelter = model_arena.copy()
+    # cv2.rectangle(model_arena_shelter, (int(500 - 50), int(500 + 385 + 25 - 50)), (int(500 + 50), int(500 + 385 + 25 + 50)), (0, 0, 255),thickness=-1)
+    # alpha = .5
+    # cv2.addWeighted(model_arena, alpha, model_arena_shelter, 1 - alpha, 0, model_arena)
 
-    # add circular wells along edge
-    number_of_circles = 20
-    for circle_num in range(number_of_circles):
-        x_center = int(500+385*np.sin(2*np.pi/number_of_circles*circle_num))
-        y_center = int(500-385*np.cos(2*np.pi/number_of_circles*circle_num))
-        cv2.circle(model_arena,(x_center,y_center),25,0,-1)
+    # # add circular wells along edge
+    # number_of_circles = 20
+    # for circle_num in range(number_of_circles):
+    #     x_center = int(500+385*np.sin(2*np.pi/number_of_circles*circle_num))
+    #     y_center = int(500-385*np.cos(2*np.pi/number_of_circles*circle_num))
+    #     cv2.circle(model_arena,(x_center,y_center),25,0,-1)
 
-    model_arena = cv2.resize(model_arena,size)
-
+    # model_arena = cv2.resize(model_arena,size)
+    model_arena = cv2.imread('C:\\Users\\Federico\\Desktop\\mazemodel.png')
     # --------------------------------------------------------------------------------------------
     # THESE ARE THE FOUR POINTS USED TO INITIATE REGISTRATION -- CUSTOMIZE FOR YOUR OWN PURPOSES
     # --------------------------------------------------------------------------------------------
@@ -84,12 +84,12 @@ def model_arena(size):
 # =================================================================================
 #              IMAGE REGISTRATION GUI
 # =================================================================================
-def register_arena(background, fisheye_map_location, x_offset, y_offset):
+def register_arena(background, fisheye_map_location, x_offset, y_offset, arena, arena_points,  savepath):
     """ extract background: first frame of first video of a session
     Allow user to specify ROIs on the background image """
 
     # create model arena and background
-    arena, arena_points = model_arena(background.shape)
+    # arena, arena_points = model_arena(background.shape)
 
     # load the fisheye correction
     try:
@@ -122,7 +122,8 @@ def register_arena(background, fisheye_map_location, x_offset, y_offset):
 
     # LOOP OVER TRANSFORM FILES
     file_num = -1;
-    transform_files = glob.glob('*transform.npy')
+    # transform_files = glob.glob('*transform.npy')
+    transform_files = [os.path.join(savepath, f) for f in os.listdir(savepath) if 'transform.py' in f]
     for file_num, transform_file in enumerate(transform_files[::-1]):
 
         # USE LOADED TRANSFORM AND SEE IF IT'S GOOD
@@ -172,9 +173,9 @@ def register_arena(background, fisheye_map_location, x_offset, y_offset):
 
             # add 1-2-3-4 markers to model arena
             for i, point in enumerate(arena_points.astype(np.uint32)):
-                arena = cv2.circle(arena, (point[0], point[1]), 3, 255, -1)
-                arena = cv2.circle(arena, (point[0], point[1]), 4, 0, 1)
-                cv2.putText(arena, str(i+1), tuple(point), 0, .55, 150, thickness=2)
+                arena = cv2.circle(arena, (point[0], point[1]), 3, [0, 0, 255], -1)
+                arena = cv2.circle(arena, (point[0], point[1]), 4, [0, 255, 255], 1)
+                cv2.putText(arena, str(i+1), tuple(point), 0, .55, [0, 0, 255], thickness=2)
 
                 point = np.reshape(point, (1, 2))
                 arena_data[1] = np.concatenate((arena_data[1], point))
@@ -201,12 +202,15 @@ def register_arena(background, fisheye_map_location, x_offset, y_offset):
         # perform projective transform
         # M = cv2.findHomography(background_data[1], arena_data[1])
         M = cv2.estimateRigidTransform(background_data[1], arena_data[1], False)
+        # M = cv2.getAffineTransform(background_data[1],arena_data[1])
 
+        if not M.any():
+            raise ValueError('Could not calculate Rigid Transform')
 
         # REGISTER BACKGROUND, BE IT WITH LOADED OR CREATED TRANSFORM
         # registered_background = cv2.warpPerspective(background_copy,M[0],background.shape)
-        registered_background = cv2.warpAffine(background_copy, M, background.shape)
 
+        registered_background = cv2.warpAffine(background_copy, M, background.shape[:2])
         # --------------------------------------------------
         # overlay images
         # --------------------------------------------------
@@ -304,8 +308,8 @@ def register_arena(background, fisheye_map_location, x_offset, y_offset):
                                                * np.squeeze(color_array[:, :, :, 0])).astype(np.uint8)
                 overlaid_arenas = cv2.addWeighted(registered_background_color, alpha, arena_color, 1 - alpha, 0)
                 update_transform_data[0] = overlaid_arenas
-
-        np.save(str(file_num+1)+'_transform',[M, update_transform_data[1], update_transform_data[2], fisheye_map_location])
+        save_name = os.path.join(savepath, str(file_num+1)+'_transform')
+        np.save(save_name,[M, update_transform_data[1], update_transform_data[2], fisheye_map_location])
 
     cv2.destroyAllWindows()
     return [M, update_transform_data[1], update_transform_data[2], fisheye_map_location]

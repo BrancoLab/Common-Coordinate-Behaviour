@@ -7,14 +7,14 @@ from termcolor import colored
 # ========================================================
 
 # file path of behaviour video
-video_file_path = 'C:\\Users\SWC\Dropbox (UCL - SWC)\DAQ\\upstairs_rig\\18NOV02_walldownup\CA3481_loom\cam1.avi'
+video_file_path = 'Z:\\branco\\Federico\\raw_behaviour\\maze\\video\\180606_CA2762.avi'
 
 # file path of behaviour video
-save_file_path = 'C:\Drive\DLC\data\wall_data'
+save_file_path = 'C:\\Users\\Federico\\Desktop'
 
 # file path of fisheye correction -- set to an invalid location such as '' to skip fisheye correction
 # A corrective mapping for the branco lab's typical camera is included in the repo!
-fisheye_map_location = 'C:\Drive\DLC\data\\fisheye_maps.npy'
+fisheye_map_location = 'gibb.npy'
 
 # frame of stimulus onset
 stim_frame = 3000
@@ -55,7 +55,7 @@ dark_threshold = [.55,950]
 # ========================================================
 print(colored('Fetching background', 'green'))
 background_image = get_background(
-    video_file_path,start_frame=1000, avg_over=100)
+    video_file_path,start_frame=1, avg_over=1)
 
 # ========================================================
 #           REGISTER ARENA
