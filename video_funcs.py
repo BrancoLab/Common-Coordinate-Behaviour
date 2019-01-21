@@ -410,7 +410,7 @@ def peri_stimulus_video_clip(vidpath = '', videoname = '', savepath = '', start_
                     flight_image_by_distance = frame[:,:,0].copy()
 
                 # in subsequent frames, see if frame is different enough from previous image to merit joining the image
-                elif frame_num > stim_frame and (frame_num - stim_frame) < 30*10:
+                elif frame_num > stim_frame and (frame_num - stim_frame) < fps*10:
                     # get the number of pixels that are darker than the flight image
                     difference_from_previous_image = ((frame[:,:,0]+.001) / (flight_image_by_distance+.001))<dark_threshold[0] #.5 original parameter
                     number_of_darker_pixels = np.sum(difference_from_previous_image)
@@ -472,7 +472,154 @@ def peri_stimulus_video_clip(vidpath = '', videoname = '', savepath = '', start_
     # cv2.destroyAllWindows()
 
 
+def invert_fisheye_map(registration, inverse_fisheye_map_location):
+    '''Go from a normal opencv fisheye map to an inverted one, so coordinates can be transform'''
 
+    if len(registration) == 5:
+        pass
+    elif os.path.isfile(inverse_fisheye_map_location):
+        registration.append(inverse_fisheye_map_location)
+    elif len(registration) == 4:  # setup fisheye correction
+        print('creating inverse fisheye map')
+        inverse_maps = np.load(registration[3])
+        # invert maps
+        inverse_maps[inverse_maps < 0] = 0
+
+        maps_x_orig = inverse_maps[:, :, 0]
+        maps_x_orig[maps_x_orig > 1279] = 1279
+        maps_y_orig = inverse_maps[:, :, 1]
+        maps_y_orig[maps_y_orig > 1023] = 1023
+
+        map_x = np.ones(inverse_maps.shape[0:2]) * np.nan
+        map_y = np.ones(inverse_maps.shape[0:2]) * np.nan
+        for x in range(inverse_maps.shape[1]):
+            for y in range(inverse_maps.shape[0]):
+                map_x[maps_y_orig[y, x], maps_x_orig[y, x]] = x
+                map_y[maps_y_orig[y, x], maps_x_orig[y, x]] = y
+
+        grid_x, grid_y = np.mgrid[0:inverse_maps.shape[0], 0:inverse_maps.shape[1]]
+        valid_values_x = np.ma.masked_invalid(map_x)
+        valid_values_y = np.ma.masked_invalid(map_y)
+
+        valid_idx_x_map_x = grid_x[~valid_values_x.mask]
+        valid_idx_y_map_x = grid_y[~valid_values_x.mask]
+
+        valid_idx_x_map_y = grid_x[~valid_values_y.mask]
+        valid_idx_y_map_y = grid_y[~valid_values_y.mask]
+
+        map_x_interp = interpolate.griddata((valid_idx_x_map_x, valid_idx_y_map_x), map_x[~valid_values_x.mask],
+                                            (grid_x, grid_y), method='linear').astype(np.uint16)
+        map_y_interp = interpolate.griddata((valid_idx_x_map_y, valid_idx_y_map_y), map_y[~valid_values_y.mask],
+                                            (grid_x, grid_y), method='linear').astype(np.uint16)
+
+        fisheye_maps_interp = np.zeros((map_x_interp.shape[0], map_x_interp.shape[1], 2)).astype(np.uint16)
+        fisheye_maps_interp[:, :, 0] = map_x_interp
+        fisheye_maps_interp[:, :, 1] = map_y_interp
+
+        np.save('C:\\Drive\\DLC\\transforms\\inverse_fisheye_maps.npy', fisheye_maps_interp)
+
+    return registration
+
+
+
+def extract_coordinates_with_dlc(dlc_config_settings, video, registration):
+    '''extract coordinates for each frame, given a video and DLC network'''
+
+    analyze_videos(dlc_config_settings['config_file'], video)
+    # create_labeled_video(dlc_config_settings['config_file'], video)
+
+    # read the freshly saved coordinates file
+    coordinates_file = glob.glob(os.path.dirname(video[0]) + '\\*.h5')[0]
+    DLC_network = os.path.basename(coordinates_file)
+    DLC_network = DLC_network[DLC_network.find('Deep'):-3]
+    body_parts = dlc_config_settings['body parts']
+
+    DLC_dataframe = pd.read_hdf(coordinates_file)
+    coordinates = {}
+
+    # array of all body parts, axis x body part x frame
+    all_body_parts = np.zeros((2, len(body_parts), DLC_dataframe[DLC_network]['nose'].values.shape[0]))
+
+    # fisheye correct the coordinates
+    registration = invert_fisheye_map(registration, dlc_config_settings['inverse_fisheye_map_location'])
+    inverse_fisheye_maps = np.load(registration[4])
+
+
+    for i, body_part in enumerate(body_parts):
+        # initialize coordinates
+        coordinates[body_part] = np.zeros((2, len(DLC_dataframe[DLC_network][body_part]['x'].values)))
+
+        # extract coordinates
+        for j, axis in enumerate(['x', 'y']):
+            coordinates[body_part][j] = DLC_dataframe[DLC_network][body_part][axis].values
+            coordinates[body_part][j] = DLC_dataframe[DLC_network][body_part][axis].values
+
+        # put all together
+        all_body_parts[:, i, :] = coordinates[body_part]
+        median_positions = np.nanmedian(all_body_parts, axis=1)
+        # median_distance = np.sqrt(median_positions[0,:]**2 + median_positions[1,:]**2)
+
+    for body_part in body_parts:
+
+        # get likelihood
+        likelihood = DLC_dataframe[DLC_network][body_part]['likelihood'].values
+
+        # remove coordinates with low confidence
+        coordinates[body_part][0][likelihood < .9999999] = np.nan
+        coordinates[body_part][1][likelihood < .9999999] = np.nan
+
+        # remove coordinates far from rest of body parts
+        distance_from_median_position = np.sqrt( (coordinates[body_part][0] - median_positions[0,:])**2 + (coordinates[body_part][1] - median_positions[1,:])**2 )
+        coordinates[body_part][0][distance_from_median_position > 50] = np.nan
+        coordinates[body_part][1][distance_from_median_position > 50] = np.nan
+
+        # lineraly interporlate the low-confidence time points
+        coordinates[body_part][0] = np.array(pd.Series(coordinates[body_part][0]).interpolate())
+        coordinates[body_part][0][0:np.argmin(np.isnan(coordinates[body_part][0]))] = coordinates[body_part][0][
+            np.argmin(np.isnan(coordinates[body_part][0]))]
+
+        coordinates[body_part][1] = np.array(pd.Series(coordinates[body_part][1]).interpolate())
+        coordinates[body_part][1][0:np.argmin(np.isnan(coordinates[body_part][1]))] = coordinates[body_part][1][
+            np.argmin(np.isnan(coordinates[body_part][1]))]
+
+        # convert original coordinates to registered coordinates
+        coordinates[body_part][0] = inverse_fisheye_maps[
+                                        coordinates[body_part][1].astype(np.uint16) + y_offset, coordinates[body_part][
+                                            0].astype(np.uint16) + x_offset, 0] - x_offset
+        coordinates[body_part][1] = inverse_fisheye_maps[
+                                        coordinates[body_part][1].astype(np.uint16) + y_offset, coordinates[body_part][
+                                            0].astype(np.uint16) + x_offset, 1] - y_offset
+
+        # affine transform to match model arena
+        transformed_points = np.matmul(np.append(registration[0], np.zeros((1, 3)), 0),
+                                       np.concatenate((coordinates[body_part][0:1], coordinates[body_part][1:2],
+                                                       np.ones((1, len(coordinates[body_part][0])))), 0))
+        coordinates[body_part][0] = transformed_points[0, :]
+        coordinates[body_part][1] = transformed_points[1, :]
+
+        # plot the coordinates
+        # ax.plot(np.sqrt((coordinates[body_part][0] - 500 * 720 / 1000) ** 2 + (coordinates[body_part][1] - 885 * 720 / 1000) ** 2))
+        # plt.pause(.01)
+
+    # compute some metrics
+    for i, body_part in enumerate(body_parts):
+        all_body_parts[:, i, :] = coordinates[body_part]
+
+    coordinates['head_location'] = np.nanmean(all_body_parts[:, 0:5, :], axis=1)
+    coordinates['snout_location'] = np.nanmean(all_body_parts[:, 0:3, :], axis=1)
+    # coordinates['neck_location'] = np.nanmean(all_body_parts[:, 3:5, :], axis=1)
+    coordinates['butt_location'] = np.nanmean(all_body_parts[:, 9:, :], axis=1)
+    coordinates['back_location'] = np.nanmean(all_body_parts[:, 6:9, :], axis=1)
+    coordinates['center_body_location'] = np.nanmean(all_body_parts[:, 6:, :], axis=1)
+    coordinates['center_location'] = np.nanmean(all_body_parts[:, :, :], axis=1)
+
+    delta_position = np.concatenate( ( np.zeros((2,1)), np.diff(coordinates['center_location']) ) , axis = 1)
+    coordinates['speed'] = np.sqrt(delta_position[0,:]**2 + delta_position[1,:]**2)
+
+    coordinates['distance_from_shelter'] = np.sqrt((coordinates['center_location'][0] - 500 * 720 / 1000) ** 2 +
+                                                   (coordinates['center_location'][1] - 885 * 720 / 1000) ** 2)
+
+    coordinates['speed_toward_shelter'] = np.concatenate( ([0], np.diff(coordinates['distance_from_shelter'])))
 ########################################################################################################################
 if __name__ == "__main__":
     peri_stimulus_video_clip(vidpath='', videoname='', savepath='', start_frame=0., end_frame=100., stim_frame=0,
