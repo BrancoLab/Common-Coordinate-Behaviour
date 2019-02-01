@@ -48,33 +48,9 @@ def get_background(vidpath, start_frame = 1000, avg_over = 100):
 def model_arena(size):
     ''' NOTE: this is the model arena for the Barnes maze with wall
     this function must be customized for any other arena'''
-    # # initialize model arena
-    # model_arena = np.zeros((1000,1000)).astype(np.uint8)
-    # cv2.circle(model_arena, (500,500), 460, 255, -1)
-
-    # # add wall - up
-    # cv2.rectangle(model_arena, (int(500 - 554 / 2), int(500 - 6 / 2)), (int(500 + 554 / 2), int(500 + 6 / 2)), 60, thickness=-1)
-    # # add wall - down
-    # cv2.rectangle(model_arena, (int(500 - 504 / 2), int(500 - 8 / 2)), (int(500 + 504 / 2), int(500 + 8 / 2)), 0, thickness=-1)
-
-    # # add shelter
-    # model_arena_shelter = model_arena.copy()
-    # cv2.rectangle(model_arena_shelter, (int(500 - 50), int(500 + 385 + 25 - 50)), (int(500 + 50), int(500 + 385 + 25 + 50)), (0, 0, 255),thickness=-1)
-    # alpha = .5
-    # cv2.addWeighted(model_arena, alpha, model_arena_shelter, 1 - alpha, 0, model_arena)
-
-    # # add circular wells along edge
-    # number_of_circles = 20
-    # for circle_num in range(number_of_circles):
-    #     x_center = int(500+385*np.sin(2*np.pi/number_of_circles*circle_num))
-    #     y_center = int(500-385*np.cos(2*np.pi/number_of_circles*circle_num))
-    #     cv2.circle(model_arena,(x_center,y_center),25,0,-1)
-
     # model_arena = cv2.resize(model_arena,size)
     model_arena = cv2.imread('C:\\Users\\Federico\\Desktop\\mazemodel.png')
-    # --------------------------------------------------------------------------------------------
-    # THESE ARE THE FOUR POINTS USED TO INITIATE REGISTRATION -- CUSTOMIZE FOR YOUR OWN PURPOSES
-    # --------------------------------------------------------------------------------------------
+
     points = np.array(([500,500+460-75],[500-460+75,500],[500,500-460+75],[500+460-75,500]))* [size[0]/1000,size[1]/1000]
 
     # cv2.imshow('model_arena',model_arena)
@@ -84,7 +60,7 @@ def model_arena(size):
 # =================================================================================
 #              IMAGE REGISTRATION GUI
 # =================================================================================
-def register_arena(background, fisheye_map_location, x_offset, y_offset, arena, arena_points,  savepath):
+def register_arena(background, fisheye_map_location, x_offset, y_offset, arena, arena_points,  savepath, savename):
     """ extract background: first frame of first video of a session
     Allow user to specify ROIs on the background image """
 
@@ -98,11 +74,11 @@ def register_arena(background, fisheye_map_location, x_offset, y_offset, arena, 
         map2 = maps[:, :, 2]*0
 
         background_copy = cv2.copyMakeBorder(background, x_offset, int((map1.shape[0] - background.shape[0]) - x_offset),
-                                             y_offset, int((map1.shape[1] - background.shape[1]) - y_offset),cv2.BORDER_CONSTANT, value=0)
-
+                                                y_offset, int((map1.shape[1] - background.shape[1]) - y_offset),cv2.BORDER_CONSTANT, value=0)
+        raise NotImplementedError('Border is added just to the right making the correction skewed to one side')
         background_copy = cv2.remap(background_copy, map1, map2, interpolation=cv2.INTER_LINEAR,borderMode=cv2.BORDER_CONSTANT, borderValue=0)
         background_copy = background_copy[x_offset:-int((map1.shape[0] - background.shape[0])- x_offset),
-                                          y_offset:-int((map1.shape[1] - background.shape[1]) - y_offset)]
+                                            y_offset:-int((map1.shape[1] - background.shape[1]) - y_offset)]
     except:
         background_copy = background.copy()
         fisheye_map_location = ''
@@ -121,9 +97,9 @@ def register_arena(background, fisheye_map_location, x_offset, y_offset, arena, 
     use_loaded_points = False
 
     # LOOP OVER TRANSFORM FILES
-    file_num = -1;
+    file_num = -1
     # transform_files = glob.glob('*transform.npy')
-    transform_files = [os.path.join(savepath, f) for f in os.listdir(savepath) if 'transform.py' in f]
+    transform_files = [os.path.join(savepath, f) for f in os.listdir(savepath) if savename.split('.')[0] in f]
     for file_num, transform_file in enumerate(transform_files[::-1]):
 
         # USE LOADED TRANSFORM AND SEE IF IT'S GOOD
@@ -308,7 +284,7 @@ def register_arena(background, fisheye_map_location, x_offset, y_offset, arena, 
                                                * np.squeeze(color_array[:, :, :, 0])).astype(np.uint8)
                 overlaid_arenas = cv2.addWeighted(registered_background_color, alpha, arena_color, 1 - alpha, 0)
                 update_transform_data[0] = overlaid_arenas
-        save_name = os.path.join(savepath, str(file_num+1)+'_transform')
+        save_name = os.path.join(savepath, savename)
         np.save(save_name,[M, update_transform_data[1], update_transform_data[2], fisheye_map_location])
 
     cv2.destroyAllWindows()
@@ -361,124 +337,6 @@ def make_color_array(colors, image_size):
 
 
 
-# =================================================================================
-#              GENERATE PERI-STIMULUS VIDEO CLIPS and FLIGHT IMAGE
-# =================================================================================
-def peri_stimulus_video_clip(vidpath = '', videoname = '', savepath = '', start_frame=0., end_frame=100., stim_frame = 0,
-                             registration = 0, x_offset = 0, y_offset = 0, dark_threshold = [.55, 950],
-                             fps=False, save_clip = False, display_clip = False, counter = True, make_flight_image = True):
-    # GET BEAHVIOUR VIDEO - ######################################
-    vid = cv2.VideoCapture(vidpath)
-    if not fps: fps = vid.get(cv2.CAP_PROP_FPS)
-    width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-    # SETUP VIDEO CLIP SAVING - ######################################
-    # file_already_exists = os.path.isfile(os.path.join(savepath,videoname+'.avi'))
-    fourcc = cv2.VideoWriter_fourcc(*"XVID")  # LJPG for lossless, XVID for compressed
-    border_size = 20
-    if save_clip:
-        video_clip = cv2.VideoWriter(os.path.join(savepath,videoname+'.avi'), fourcc, fps, (width+2*border_size*counter, height+2*border_size*counter), counter)
-    vid.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
-
-    pre_stim_color = [255, 120, 120]
-    post_stim_color = [120, 120, 255]
-
-    if registration[3]: # setup fisheye correction
-        maps = np.load(registration[3])
-        map1 = maps[:, :, 0:2]
-        map2 = maps[:, :, 2] * 0
-    else:
-        print(colored('Fisheye correction unavailable', 'green'))
-    # RUN SAVING AND ANALYSIS OVER EACH FRAME - ######################################
-    while True: #and not file_already_exists:
-        ret, frame = vid.read()  # get the frame
-        if ret:
-            frame_num = vid.get(cv2.CAP_PROP_POS_FRAMES)
-            if [registration]:
-                # load the fisheye correction
-                frame_register = frame[:, :, 0]
-                if registration[3]:
-                    frame_register = cv2.copyMakeBorder(frame_register, x_offset, int((map1.shape[0] - frame.shape[0]) - x_offset),
-                                                         y_offset, int((map1.shape[1] - frame.shape[1]) - y_offset), cv2.BORDER_CONSTANT, value=0)
-                    frame_register = cv2.remap(frame_register, map1, map2, interpolation=cv2.INTER_LINEAR,
-                                                borderMode=cv2.BORDER_CONSTANT, borderValue=0)
-                    frame_register = frame_register[x_offset:-int((map1.shape[0] - frame.shape[0]) - x_offset),
-                                      y_offset:-int((map1.shape[1] - frame.shape[1]) - y_offset)]
-                frame = cv2.cvtColor(cv2.warpAffine(frame_register, registration[0], frame.shape[0:2]),cv2.COLOR_GRAY2RGB)
-
-            # MAKE ESCAPE TRAJECTORY IMAGE - #######################################
-            if make_flight_image:
-                # at stimulus onset, take this frame to lay all the superimposed mice on top of
-                if frame_num == stim_frame:
-                    flight_image_by_distance = frame[:,:,0].copy()
-
-                # in subsequent frames, see if frame is different enough from previous image to merit joining the image
-                elif frame_num > stim_frame and (frame_num - stim_frame) < 30*10:
-                    # get the number of pixels that are darker than the flight image
-                    difference_from_previous_image = ((frame[:,:,0]+.001) / (flight_image_by_distance+.001))<dark_threshold[0] #.5 original parameter
-                    number_of_darker_pixels = np.sum(difference_from_previous_image)
-
-                    # if that number is high enough, add mouse to image
-                    if number_of_darker_pixels > dark_threshold[1]: # 850 original parameter
-                        # add mouse where pixels are darker
-                        flight_image_by_distance[difference_from_previous_image] = frame[difference_from_previous_image,0]
-
-            # SHOW BOUNDARY AND TIME COUNTER - #######################################
-            if counter and (display_clip or save_clip):
-                # cv2.rectangle(frame, (0, height), (150, height - 60), (150,150,150), -1)
-                if frame_num < stim_frame:
-                    cur_color = tuple([x * ((frame_num - start_frame) / (stim_frame - start_frame)) for x in pre_stim_color])
-                    sign = ''
-                else:
-                    cur_color = tuple([x * (1 - (frame_num - stim_frame) / (end_frame-stim_frame))  for x in post_stim_color])
-                    sign = '+'
-
-                # border and colored rectangle around frame
-                frame = cv2.copyMakeBorder(frame, border_size, border_size, border_size, border_size,cv2.BORDER_CONSTANT, value=cur_color)
-
-                # report video details
-                cv2.putText(frame, videoname, (20, 40), 0, .55, (180, 180, 180), thickness=1)
-
-                # report time relative to stimulus onset
-                frame_time = (frame_num - stim_frame) / fps
-                frame_time = str(round(.2*round(frame_time/.2), 1))+ '0'*(abs(frame_time)<10)
-                cv2.putText(frame, sign + str(frame_time) + 's', (width-110, height+10), 0, 1,(180,180,180), thickness=2)
-
-            else:
-                frame = frame[:,:,0] # or use 2D grayscale image instead
-
-            # SHOW AND SAVE FRAME - #######################################
-            if display_clip:
-                cv2.imshow('Trial Clip', frame)
-            if save_clip:
-                video_clip.write(frame)
-            if display_clip:
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-            if frame_num >= end_frame:
-                break
-        else:
-            print('Problem with movie playback')
-            cv2.waitKey(1000)
-            break
-
-    # wrap up
-    vid.release()
-    if make_flight_image:
-        flight_image_by_distance = cv2.copyMakeBorder(flight_image_by_distance, border_size, border_size, border_size, border_size, cv2.BORDER_CONSTANT, value=0)
-        cv2.putText(flight_image_by_distance, videoname, (border_size, border_size-5), 0, .55, (180, 180, 180), thickness=1)
-        cv2.imshow('Flight image', flight_image_by_distance)
-        cv2.waitKey(10)
-        scipy.misc.imsave(os.path.join(savepath, videoname + '.tif'), flight_image_by_distance)
-    if save_clip:
-        video_clip.release()
-    # cv2.destroyAllWindows()
-
-
-
 ########################################################################################################################
 if __name__ == "__main__":
-    peri_stimulus_video_clip(vidpath='', videoname='', savepath='', start_frame=0., end_frame=100., stim_frame=0,
-                             registration=0, fps=False, save_clip=False, display_clip=False, counter=True,
-                             make_flight_image=True)
+    model_arena(1000)
