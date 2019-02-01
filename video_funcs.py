@@ -84,7 +84,7 @@ def model_arena(size):
 # =================================================================================
 #              IMAGE REGISTRATION GUI
 # =================================================================================
-def register_arena(background, fisheye_map_location, x_offset, y_offset):
+def register_arena(background, fisheye_map_location, y_offset, x_offset):
     """ extract background: first frame of first video of a session
     Allow user to specify ROIs on the background image """
 
@@ -97,12 +97,12 @@ def register_arena(background, fisheye_map_location, x_offset, y_offset):
         map1 = maps[:, :, 0:2]
         map2 = maps[:, :, 2]*0
 
-        background_copy = cv2.copyMakeBorder(background, x_offset, int((map1.shape[0] - background.shape[0]) - x_offset),
-                                             y_offset, int((map1.shape[1] - background.shape[1]) - y_offset),cv2.BORDER_CONSTANT, value=0)
+        background_copy = cv2.copyMakeBorder(background, y_offset, int((map1.shape[0] - background.shape[0]) - y_offset),
+                                             x_offset, int((map1.shape[1] - background.shape[1]) - x_offset), cv2.BORDER_CONSTANT, value=0)
 
         background_copy = cv2.remap(background_copy, map1, map2, interpolation=cv2.INTER_LINEAR,borderMode=cv2.BORDER_CONSTANT, borderValue=0)
-        background_copy = background_copy[x_offset:-int((map1.shape[0] - background.shape[0])- x_offset),
-                                          y_offset:-int((map1.shape[1] - background.shape[1]) - y_offset)]
+        background_copy = background_copy[y_offset:-int((map1.shape[0] - background.shape[0]) - y_offset),
+                          x_offset:-int((map1.shape[1] - background.shape[1]) - x_offset)]
     except:
         background_copy = background.copy()
         fisheye_map_location = ''
