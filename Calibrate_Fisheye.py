@@ -1,54 +1,49 @@
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
------------#                    Calibrate Fisheye Lens                            --------------------------------
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 import numpy as np; import os; import glob; import cv2
 
+'''
+FISHEYE CALIBRATION AND CORRECTION CODE
+meat of the code comes from: https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
+see Kenneth Jiang's blog post above for helpful explanation
+'''
 
-#%% -------------------------------------------------------------------------------------------------------------------------------------
-#------------------------                         Get Lens Parameters                   --------------------------------------
-#-----------------------------------------------------------------------------------------------------------------------------------------
 
-# ------------------------------------------
+'''
+SET PARAMETERS
+'''
 # Select calibration images folder location
-# ------------------------------------------
-file_loc = 'C:\Drive\Video Analysis\data\\'
-date = ''
-mouse_session = 'calibration_images\\'
-camera_name = 'fede\\'
+# the checkerboard should be large and very clearly visible and from as many orientations (in 3D) as possible
+calibration_images_loc = 'C:\\Drive\\Common-Coordinate-Behaviour\\example fisheye calibration images'
+image_extension = '.png'
 
-file_loc = file_loc + date + mouse_session + camera_name
-
-#name prepended to the saved rectification maps
+# Name prepended to the saved rectification maps
 camera = 'upstairs'
 
-
-#Set parameters
+# Set parameters
 CHECKERBOARD = (28,12) #size of the checkerboard (# of vertices in each dimension, not including those on the edge)
 
-#Go through and set pixels below the light_threshold to white and pixels above the dark_threshold to black
-
-light_thresholds = np.flip(np.arange(30,160,14),axis=0)
+# The algorithm is finnicky and likes saturation, so set pixels with values below the dark_threshold to black
 dark_threshold = 30
 
 
 
-# -------------------------
-# Find checkerboard corners
-# -------------------------
 
-#Find checkerboard corners -- set up for .pngs
+'''
+FIND THE CHECKERBOARD CORNERS IN THE IMAGES
+(pretty slow)
+'''
+# Find checkerboard corners -- set up for .pngs
 CHECKERFLIP = tuple(np.flip(CHECKERBOARD,0))
 subpix_criteria = (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
 calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC+cv2.fisheye.CALIB_FIX_SKEW #+cv2.fisheye.CALIB_CHECK_COND
 objp = np.zeros((1, CHECKERBOARD[0]*CHECKERBOARD[1], 3), np.float32)
-objp[0,:,:2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+
 _img_shape = None
 objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
-images = glob.glob(file_loc + '*.png')
+images = glob.glob(calibration_images_loc + '\\*' + image_extension) # find the images in the folder
+print('found ' + str(len(images)) + ' images for calibration.')
+
 for fname in images:
     img = cv2.imread(fname)
     if _img_shape == None:
@@ -56,40 +51,42 @@ for fname in images:
     else:
         assert _img_shape == img.shape[:2], "All images must share the same size."
     
-    calib_image_pre = cv2.cvtColor(img.astype(uint8),cv2.COLOR_BGR2GRAY)
+    calib_image_pre = cv2.cvtColor(img.astype(np.uint8),cv2.COLOR_BGR2GRAY)
     #increase contrast
-    for light_threshold in light_thresholds:
-        calib_image = calib_image_pre
-        
-        calib_image[calib_image<dark_threshold] = 0
-        calib_image[calib_image>light_threshold] = 255
+    # for light_threshold in light_thresholds:
+    calib_image = calib_image_pre
 
-        cv2.imshow('calibration image',calib_image)
-        if cv2.waitKey(5) & 0xFF == ord('q'):
-            break
-        # Find the chess board corners
-        ret, corners = cv2.findChessboardCorners(calib_image, CHECKERBOARD, cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_NORMALIZE_IMAGE+cv2.CALIB_CB_FAST_CHECK)
-        
-        if ret:
-            cv2.waitKey(5)
-            break
-    print(ret)
+    calib_image[calib_image<dark_threshold] = 0
+    # calib_image[calib_image>light_threshold] = 255
+
+    cv2.imshow('calibration image',calib_image)
+    cv2.waitKey(5)
+
+    # Find the chess board corners (takes a while)
+    ret, corners = cv2.findChessboardCorners(calib_image, CHECKERBOARD, cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_NORMALIZE_IMAGE+cv2.CALIB_CB_FAST_CHECK)
+
     # If found, add object points, image points (after refining them)
     if ret == True:
+        print(fname + ': successfully identified corners')
+
+        # objpoints = np.append(objpoints, objp)
         objpoints.append(objp)
-        corners2 = cv2.cornerSubPix(calib_image,corners,(11,11),(-1,-1),subpix_criteria) #11,11?
+
+        corners2 = cv2.cornerSubPix(calib_image,corners,(11,11),(-1,-1),subpix_criteria)
         imgpoints.append(corners)
 
         # Draw and display the corners
         cv2.drawChessboardCorners(calib_image, CHECKERBOARD, corners2, ret)
         cv2.imshow('calibration image', calib_image)
         cv2.waitKey(500)
+    else:
+        print(fname + ': failed to identify corners')
         
         
         
-# -----------------------------------------------------------------
-# Use checkerboard corners to get the calibration matrices K and D
-# -----------------------------------------------------------------
+'''
+USE THE CORNERS FOUND ABOVE TO GET THE CALIBRATION MATRICES K AND D
+'''
 N_OK = len(objpoints)
 K = np.zeros((3, 3))
 D = np.zeros((4, 1))
@@ -107,30 +104,28 @@ rms, _, _, _, _ = \
         calibration_flags,
         (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
     )
-print("Found " + str(N_OK) + " valid images for calibration")
+print("found " + str(N_OK) + " valid images for calibration")
 print("DIM=" + str(_img_shape[::-1]))
 print("K=np.array(" + str(K.tolist()) + ")")
 print("D=np.array(" + str(D.tolist()) + ")")
 
 
 
-#%% -------------------------------------------------------------------------------------------------------------------------------------
-#------------------------                Test Calibration and Save Remappings                       --------------------------------------
-#-----------------------------------------------------------------------------------------------------------------------------------------
-
+'''
+TEST THE CALIBRATION AND SAVE THE REMAPPINGS
+'''
 # Display recalibrated images
 DIM=_img_shape[::-1]
 K=np.array(K)
 D=np.array(D)
-for img_path in glob.glob(file_loc + '*.png'):
+for img_path in images:
     img = cv2.imread(img_path)
-    
-    
+
+    # correct image
     h,w = img.shape[:2]
     map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, DIM, cv2.CV_16SC2)
     undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
 
-    
     dim1 = img.shape[:2][::-1]  #dim1 is the dimension of input image to un-distort
     assert dim1[0]/dim1[1] == DIM[0]/DIM[1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
     dim2 = dim1 #dim2 is the dimension of remapped image
@@ -140,21 +135,23 @@ for img_path in glob.glob(file_loc + '*.png'):
     new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(K, D, dim2, np.eye(3), balance=1)
     map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), new_K, dim3, cv2.CV_16SC2)
     undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-    
-    
-    cv2.imshow("correction", img)
-    if cv2.waitKey(500) & 0xFF == ord('q'):
+
+    cv2.imshow("correction -- before and after", img)
+    if cv2.waitKey(1000) & 0xFF == ord('q'):
        break 
-    cv2.imshow('correction', undistorted_img)
-    if cv2.waitKey(500) & 0xFF == ord('q'):
+    cv2.imshow("correction -- before and after", undistorted_img)
+    if cv2.waitKey(1000) & 0xFF == ord('q'):
        break 
-   
-# save maps to use in analysis!
-# to be used like: undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)       
-maps = np.zeros((calib_image.shape[0],calib_image.shape[1],3)).astype(int16)
+
+
+'''
+SAVE MAPS TO USE IN ANALYSIS
+see the register_frame() function in Video_Functions.py for an example of how to use this for frame-by-frame correction
+'''
+maps = np.zeros((calib_image.shape[0],calib_image.shape[1],3)).astype(np.int16)
 maps[:,:,0:2] = map1
 maps[:,:,2] = map2
-np.save(file_loc + 'fisheye_maps_' + camera + '.npy', maps)
+np.save(calibration_images_loc + 'fisheye_maps_' + camera + '.npy', maps)
 
 
 
