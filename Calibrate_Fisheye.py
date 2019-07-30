@@ -12,7 +12,7 @@ SET PARAMETERS
 '''
 # Select calibration images folder location
 # the checkerboard should be large and very clearly visible and from as many orientations (in 3D) as possible
-calibration_images_loc = 'C:\\Drive\\Common-Coordinate-Behaviour\\example fisheye calibration images'
+calibration_images_loc = 'C:\\Drive\\Common-Coordinate-Behaviour\\example fisheye calibration images\\'
 image_extension = '.png'
 
 # Name prepended to the saved rectification maps
@@ -41,7 +41,7 @@ objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 _img_shape = None
 objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
-images = glob.glob(calibration_images_loc + '\\*' + image_extension) # find the images in the folder
+images = glob.glob(calibration_images_loc + '*' + image_extension) # find the images in the folder
 print('found ' + str(len(images)) + ' images for calibration.')
 
 for fname in images:

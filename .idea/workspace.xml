@@ -2,15 +2,75 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cabf8c93-3b05-4cea-a005-4216f226af5e" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/Inverse_Fisheye_Functions.py" />
-      <change beforePath="$PROJECT_DIR$/.idea/Common-Coordinate-Behaviour.iml" afterPath="$PROJECT_DIR$/.idea/Common-Coordinate-Behaviour.iml" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/Calibrate_Fisheye.py" afterPath="$PROJECT_DIR$/Calibrate_Fisheye.py" />
-      <change beforePath="$PROJECT_DIR$/Register_and_show_flight.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/fisheye_maps.npy" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/inverse_fisheye_maps.npy" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/video_funcs.py" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac10.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac11.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac12.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac13.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac14.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac15.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac16.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac17.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac3.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac4.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac5.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac6.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac7.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac8.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/ac9.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA10.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA11.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA12.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA13.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA14.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA15.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA16.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA17.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA18.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA19.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA7.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA8.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA9.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA_1.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA_2.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA_3.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA_4.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA_5.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/acA_6.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/calib2.avi" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam1.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam10.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam11.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam110.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam111.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam112.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam113.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam114.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam115.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam116.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam117.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam118.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam119.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam12.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam17.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam18.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam19.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam1_1.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam1_2.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam1_3.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam1_4.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam1_5.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam1_6.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam2.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam3.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam4.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam5.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam6.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam7.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam8.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration images/temp/cam9.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example fisheye calibration imagesfisheye_maps_upstairs.npy" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example image.JPG" afterPath="" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -20,7 +80,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/Common_Coordinate_Behaviour$Calibrate_Fisheye.coverage" NAME="Calibrate_Fisheye Coverage Results" MODIFIED="1564498040486" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Common_Coordinate_Behaviour$Calibrate_Fisheye.coverage" NAME="Calibrate_Fisheye Coverage Results" MODIFIED="1564498915477" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Common_Coordinate_Behaviour$Register_and_Display_Behavior.coverage" NAME="Register_and_Display_Behavior Coverage Results" MODIFIED="1564492857527" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Common_Coordinate_Behaviour$Register_and_show_flight.coverage" NAME="Register_and_show_flight Coverage Results" MODIFIED="1564487916839" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
@@ -51,16 +111,16 @@
       <file leaf-file-name="Calibrate_Fisheye.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Calibrate_Fisheye.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="5" column="59" lean-forward="false" selection-start-line="5" selection-start-column="59" selection-end-line="5" selection-end-column="59" />
+            <state relative-caret-position="-158">
+              <caret line="43" column="45" lean-forward="false" selection-start-line="43" selection-start-column="45" selection-end-line="43" selection-end-column="45" />
               <folding>
-                <marker date="1564498102253" expanded="true" signature="299:343" ph="..." />
-                <marker date="1564498102253" expanded="true" signature="986:1033" ph="..." />
-                <marker date="1564498102253" expanded="true" signature="1717:3011" ph="..." />
-                <marker date="1564498102253" expanded="true" signature="2052:2463" ph="..." />
-                <marker date="1564498102253" expanded="true" signature="3106:3178" ph="..." />
-                <marker date="1564498102253" expanded="true" signature="3898:3928" ph="..." />
-                <marker date="1564498102253" expanded="true" signature="4001:5296" ph="..." />
+                <marker date="1564498912002" expanded="true" signature="299:343" ph="..." />
+                <marker date="1564498912002" expanded="true" signature="988:1035" ph="..." />
+                <marker date="1564498912002" expanded="true" signature="1717:3011" ph="..." />
+                <marker date="1564498912002" expanded="true" signature="2052:2463" ph="..." />
+                <marker date="1564498912002" expanded="true" signature="3106:3178" ph="..." />
+                <marker date="1564498912002" expanded="true" signature="3898:3928" ph="..." />
+                <marker date="1564498912002" expanded="true" signature="4001:5296" ph="..." />
               </folding>
             </state>
           </provider>
@@ -280,7 +340,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="2552" y="-689" width="1456" height="2536" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -294,7 +353,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="FLOATING" visible="true" show_stripe_button="true" weight="0.31288344" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="659" y="0" width="1901" height="1400" />
+      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="FLOATING" visible="true" show_stripe_button="true" weight="0.31288344" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="659" y="0" width="1901" height="1400" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -439,16 +498,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Calibrate_Fisheye.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="5" column="59" lean-forward="false" selection-start-line="5" selection-start-column="59" selection-end-line="5" selection-end-column="59" />
+        <state relative-caret-position="-158">
+          <caret line="43" column="45" lean-forward="false" selection-start-line="43" selection-start-column="45" selection-end-line="43" selection-end-column="45" />
           <folding>
-            <marker date="1564498102253" expanded="true" signature="299:343" ph="..." />
-            <marker date="1564498102253" expanded="true" signature="986:1033" ph="..." />
-            <marker date="1564498102253" expanded="true" signature="1717:3011" ph="..." />
-            <marker date="1564498102253" expanded="true" signature="2052:2463" ph="..." />
-            <marker date="1564498102253" expanded="true" signature="3106:3178" ph="..." />
-            <marker date="1564498102253" expanded="true" signature="3898:3928" ph="..." />
-            <marker date="1564498102253" expanded="true" signature="4001:5296" ph="..." />
+            <marker date="1564498912002" expanded="true" signature="299:343" ph="..." />
+            <marker date="1564498912002" expanded="true" signature="988:1035" ph="..." />
+            <marker date="1564498912002" expanded="true" signature="1717:3011" ph="..." />
+            <marker date="1564498912002" expanded="true" signature="2052:2463" ph="..." />
+            <marker date="1564498912002" expanded="true" signature="3106:3178" ph="..." />
+            <marker date="1564498912002" expanded="true" signature="3898:3928" ph="..." />
+            <marker date="1564498912002" expanded="true" signature="4001:5296" ph="..." />
           </folding>
         </state>
       </provider>
