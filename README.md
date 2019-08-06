@@ -11,8 +11,11 @@ To test it out, run the file _Register_and_Display_Behavior.py_
 
 Lastly, be sure to first install open-cv! (in my case, I pip installed a file called opencv_python-3.4.0+contrib-cp36-cp36m-win_amd64 downloaded from https://www.lfd.uci.edu/~gohlke/pythonlibs/#opencv)
 
+---
+
 ![](https://github.com/BrancoLab/Common-Coordinate-Behaviour/blob/master/example.JPG)
 The GUI from the _register_arena()_ function. Clicking on the points on the video frame (left) that correspond to the four points indicated in the model arena (center) transforms the image such that it is aligned and overlaid with the model arena (right)
+
 
 ![](https://github.com/BrancoLab/Common-Coordinate-Behaviour/blob/master/example2.jpg)
 
