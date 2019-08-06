@@ -5,7 +5,7 @@ Use _Register_and_Display_Behavior.py_ to register videos and display behavioral
 
 Relevant functions are found in _Video_Functions.py_. In particular the _model_arena()_ function must be customized to match the particular arena or object in your videos.
 
-Use _Calibrate_Fisheye.py_ to calibrate fisheye distortion in your camera
+Use _Calibrate_Fisheye.py_ to calibrate fisheye distortion in your camera. (Includes code borrowed from Kenneth Jiang medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0)
 
 To test it out, run the file _Register_and_Display_Behavior.py_
 
