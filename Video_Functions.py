@@ -220,7 +220,7 @@ def register_arena(background, fisheye_map_location, y_offset, x_offset, show_ar
     Allow user to specify ROIs on the background image """
 
     # create model arena and background
-    arena, arena_points = model_arena(background.shape, show_arena)
+    arena, arena_points = model_arena(background.shape[::-1], show_arena)
 
     # load the fisheye correction
     try:
@@ -334,7 +334,7 @@ def register_arena(background, fisheye_map_location, y_offset, x_offset, show_ar
 
 
         # REGISTER BACKGROUND, BE IT WITH LOADED OR CREATED TRANSFORM
-        registered_background = cv2.warpAffine(background_copy, M, background.shape)
+        registered_background = cv2.warpAffine(background_copy, M, background.shape[::-1])
 
         # --------------------------------------------------
         # overlay images
@@ -430,7 +430,7 @@ def register_arena(background, fisheye_map_location, y_offset, x_offset, show_ar
             if update_transform:
                 update_transform_data[3] = M
                 # registered_background = cv2.warpPerspective(background_copy, M, background.shape)
-                registered_background = cv2.warpAffine(background_copy, M, background.shape)
+                registered_background = cv2.warpAffine(background_copy, M, background.shape[::-1])
                 registered_background_color = (cv2.cvtColor(registered_background, cv2.COLOR_GRAY2RGB)
                                                * np.squeeze(color_array[:, :, :, 0])).astype(np.uint8)
                 overlaid_arenas = cv2.addWeighted(registered_background_color, alpha, arena_color, 1 - alpha, 0)
